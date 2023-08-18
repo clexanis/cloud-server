@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "clexanis"
+    commit-message:
+      prefix: "[Git submodule] "
+    labels:
+      - "Git submodule dependencies"
+      - "Dependabot"
+    reviewers:
+      - "clexanis"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "clexanis"
+    commit-message:
+      prefix: "[GitHub Actions] "
+    labels:
+      - "GitHub Actions dependencies"
+      - "Dependabot"
+    reviewers:
+      - "clexanis"
