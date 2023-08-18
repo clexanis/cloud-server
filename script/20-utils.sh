@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo apt-get install memlockd needrestart -y
+sudo apt-get install chrony memlockd needrestart -y
