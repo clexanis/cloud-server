@@ -15,24 +15,25 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
+        # Set entrypoint port #
+        - traefik.http.services.portainer.loadbalancer.server.port=9000
 
       # Set HTTP domain #
-      - traefik.http.routers.portainer.entrypoints=web
-      - traefik.http.routers.portainer.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.portainer.entrypoints=web
+        - traefik.http.routers.portainer.rule=Host(`${DOMAIN}`)
 
 networks:
   default:

@@ -33,29 +33,30 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.keycloak.loadbalancer.server.port=8080
+        # Set entrypoint port #
+        - traefik.http.services.keycloak.loadbalancer.server.port=8080
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.keycloak.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.keycloak.entrypoints=web
-      - traefik.http.routers.keycloak.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.keycloak.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.keycloak.entrypoints=web
+        - traefik.http.routers.keycloak.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.keycloak-secure.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.keycloak-secure.entrypoints=websecure
+        # Set HTTPS domain #
+        - traefik.http.routers.keycloak-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.keycloak-secure.entrypoints=websecure
 
 networks:
   default:

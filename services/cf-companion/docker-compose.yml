@@ -29,12 +29,13 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
 networks:
   default:

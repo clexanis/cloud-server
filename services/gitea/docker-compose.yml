@@ -34,30 +34,31 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.monitor-only=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.monitor-only=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.gitea.loadbalancer.server.port=3000
+        # Set entrypoint port #
+        - traefik.http.services.gitea.loadbalancer.server.port=3000
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.gitea.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.gitea.entrypoints=web
-      - traefik.http.routers.gitea.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.gitea.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.gitea.entrypoints=web
+        - traefik.http.routers.gitea.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.gitea-secure.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.gitea-secure.entrypoints=websecure
+        # Set HTTPS domain #
+        - traefik.http.routers.gitea-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.gitea-secure.entrypoints=websecure
 
   ### Gitea database: PostgreSQL ###
   gitea-postgresql:

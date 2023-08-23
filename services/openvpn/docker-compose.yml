@@ -14,13 +14,14 @@ services:
      - 1194:1194/udp
     volumes:
      - ${VOLUME_DIR}/openvpn-data/conf:/etc/openvpn
-    labels:
+    deploy:
+      labels:
       ## Watchtower configuration: Only enable monitoring ##
-      - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.monitor-only=true
+        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.monitor-only=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
 networks:
   default:

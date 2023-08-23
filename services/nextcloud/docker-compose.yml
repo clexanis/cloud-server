@@ -67,41 +67,42 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
+    deploy:
+      labels:
       ## Watchtower configuration: Only enable monitoring ##
-      - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.monitor-only=true
+        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.monitor-only=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.nextcloud.loadbalancer.server.port=80
+        # Set entrypoint port #
+        - traefik.http.services.nextcloud.loadbalancer.server.port=80
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.nextcloud.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.nextcloud.entrypoints=web
-      - traefik.http.routers.nextcloud.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.nextcloud.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.nextcloud.entrypoints=web
+        - traefik.http.routers.nextcloud.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.nextcloud-secure.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.nextcloud-secure.entrypoints=websecure
-      - traefik.http.routers.nextcloud-secure.middlewares=nextcloud,nextcloud-redirect
+        # Set HTTPS domain #
+        - traefik.http.routers.nextcloud-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.nextcloud-secure.entrypoints=websecure
+        - traefik.http.routers.nextcloud-secure.middlewares=nextcloud,nextcloud-redirect
 
       # Specific Nextcloud configuration #
-      - traefik.http.middlewares.nextcloud.headers.stsSeconds=155520011
-      - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
-      - traefik.http.middlewares.nextcloud.headers.stsPreload=true
-      - traefik.http.middlewares.nextcloud.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.nextcloud.headers.browserXSSFilter=true
-      - traefik.http.middlewares.nextcloud-redirect.redirectregex.permanent=true
-      - traefik.http.middlewares.nextcloud-redirect.redirectregex.regex=/.well-known/(card|cal)dav
-      - traefik.http.middlewares.nextcloud-redirect.redirectregex.replacement=/remote.php/dav/
+        - traefik.http.middlewares.nextcloud.headers.stsSeconds=155520011
+        - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
+        - traefik.http.middlewares.nextcloud.headers.stsPreload=true
+        - traefik.http.middlewares.nextcloud.headers.contentTypeNosniff=true
+        - traefik.http.middlewares.nextcloud.headers.browserXSSFilter=true
+        - traefik.http.middlewares.nextcloud-redirect.redirectregex.permanent=true
+        - traefik.http.middlewares.nextcloud-redirect.redirectregex.regex=/.well-known/(card|cal)dav
+        - traefik.http.middlewares.nextcloud-redirect.redirectregex.replacement=/remote.php/dav/
 
   ### Nextcloud cron ###
   nextcloud-cron:
@@ -132,36 +133,37 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.onlyoffice.loadbalancer.server.port=80
+        # Set entrypoint port #
+        - traefik.http.services.onlyoffice.loadbalancer.server.port=80
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.onlyoffice.rule=Host(`${DOMAIN}`) && PathPrefix(`/onlyoffice`)
-      - traefik.http.routers.onlyoffice.entrypoints=web
-      - traefik.http.routers.onlyoffice.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.onlyoffice.rule=Host(`${DOMAIN}`) && PathPrefix(`/onlyoffice`)
+        - traefik.http.routers.onlyoffice.entrypoints=web
+        - traefik.http.routers.onlyoffice.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.onlyoffice-secure.rule=Host(`${DOMAIN}`) && PathPrefix(`/onlyoffice`)
-      - traefik.http.routers.onlyoffice-secure.entrypoints=websecure
-      - traefik.http.routers.onlyoffice-secure.middlewares=onlyoffice,onlyoffice-strip
+        # Set HTTPS domain #
+        - traefik.http.routers.onlyoffice-secure.rule=Host(`${DOMAIN}`) && PathPrefix(`/onlyoffice`)
+        - traefik.http.routers.onlyoffice-secure.entrypoints=websecure
+        - traefik.http.routers.onlyoffice-secure.middlewares=onlyoffice,onlyoffice-strip
 
       # Specific OnlyOffice configuration #
-      - traefik.http.middlewares.onlyoffice-strip.stripprefix.prefixes=/onlyoffice
-      - traefik.http.middlewares.onlyoffice-strip.stripprefix.forceSlash=true
-      - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https
-      - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Host=${DOMAIN}/onlyoffice
+        - traefik.http.middlewares.onlyoffice-strip.stripprefix.prefixes=/onlyoffice
+        - traefik.http.middlewares.onlyoffice-strip.stripprefix.forceSlash=true
+        - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https
+        - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Host=${DOMAIN}/onlyoffice
 
 networks:
   default:

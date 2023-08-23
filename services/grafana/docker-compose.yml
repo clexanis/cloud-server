@@ -34,29 +34,30 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.db-grafana.loadbalancer.server.port=8080
+        # Set entrypoint port #
+        - traefik.http.services.db-grafana.loadbalancer.server.port=8080
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.db-grafana.rule=Host(`db-${DOMAIN}`)
-      - traefik.http.routers.db-grafana.entrypoints=web
-      - traefik.http.routers.db-grafana.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.db-grafana.rule=Host(`db-${DOMAIN}`)
+        - traefik.http.routers.db-grafana.entrypoints=web
+        - traefik.http.routers.db-grafana.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.db-grafana-secure.rule=Host(`db-${DOMAIN}`)
-      - traefik.http.routers.db-grafana-secure.entrypoints=websecure
+        # Set HTTPS domain #
+        - traefik.http.routers.db-grafana-secure.rule=Host(`db-${DOMAIN}`)
+        - traefik.http.routers.db-grafana-secure.entrypoints=websecure
   ## Grafana: The open and composable observability and data visualization platform ##
   grafana:
     image: grafana/grafana
@@ -72,29 +73,30 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.grafana.loadbalancer.server.port=3000
+        # Set entrypoint port #
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.grafana.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.grafana.entrypoints=web
-      - traefik.http.routers.grafana.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.grafana.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.grafana.entrypoints=web
+        - traefik.http.routers.grafana.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.grafana-secure.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.grafana-secure.entrypoints=websecure
+        # Set HTTPS domain #
+        - traefik.http.routers.grafana-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.grafana-secure.entrypoints=websecure
 
 networks:
   default:

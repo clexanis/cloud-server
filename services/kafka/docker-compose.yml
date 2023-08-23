@@ -51,24 +51,25 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+    deploy:
+      labels:
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.kafdrop.loadbalancer.server.port=9000
+        # Set entrypoint port #
+        - traefik.http.services.kafdrop.loadbalancer.server.port=9000
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.kafdrop.rule=Host(`kafdrop.${DOMAIN}`)
-      - traefik.http.routers.kafdrop.entrypoints=web
-      - traefik.http.routers.kafdrop.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.kafdrop.rule=Host(`kafdrop.${DOMAIN}`)
+        - traefik.http.routers.kafdrop.entrypoints=web
+        - traefik.http.routers.kafdrop.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.kafdrop-secure.rule=Host(`kafdrop.${DOMAIN}`)
-      - traefik.http.routers.kafdrop-secure.entrypoints=websecure
-      - traefik.http.routers.kafdrop-secure.middlewares=basic-auth@file
+        # Set HTTPS domain #
+        - traefik.http.routers.kafdrop-secure.rule=Host(`kafdrop.${DOMAIN}`)
+        - traefik.http.routers.kafdrop-secure.entrypoints=websecure
+        - traefik.http.routers.kafdrop-secure.middlewares=basic-auth@file
   ### Kafka UI: UI for Apache Kafka is a free, open-source web UI to monitor and manage Apache Kafka clusters. ###
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -85,24 +86,25 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+    deploy:
+      labels:
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.kafka-ui.loadbalancer.server.port=8080
+        # Set entrypoint port #
+        - traefik.http.services.kafka-ui.loadbalancer.server.port=8080
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.kafka-ui.rule=Host(`kafka-ui.${DOMAIN}`)
-      - traefik.http.routers.kafka-ui.entrypoints=web
-      - traefik.http.routers.kafka-ui.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.kafka-ui.rule=Host(`kafka-ui.${DOMAIN}`)
+        - traefik.http.routers.kafka-ui.entrypoints=web
+        - traefik.http.routers.kafka-ui.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.kafka-ui-secure.rule=Host(`kafka-ui.${DOMAIN}`)
-      - traefik.http.routers.kafka-ui-secure.entrypoints=websecure
-      - traefik.http.routers.kafka-ui-secure.middlewares=basic-auth@file
+        # Set HTTPS domain #
+        - traefik.http.routers.kafka-ui-secure.rule=Host(`kafka-ui.${DOMAIN}`)
+        - traefik.http.routers.kafka-ui-secure.entrypoints=websecure
+        - traefik.http.routers.kafka-ui-secure.middlewares=basic-auth@file
   ### AKHQ: Kafka GUI for Apache Kafka to manage topics, topics data, consumers group, schema registry, connect and more... ###
   akhq:
     image: tchiotludo/akhq
@@ -118,24 +120,25 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+    deploy:
+      labels:
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.akhq.loadbalancer.server.port=8080
+        # Set entrypoint port #
+        - traefik.http.services.akhq.loadbalancer.server.port=8080
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.akhq.rule=Host(`akhq.${DOMAIN}`)
-      - traefik.http.routers.akhq.entrypoints=web
-      - traefik.http.routers.akhq.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.akhq.rule=Host(`akhq.${DOMAIN}`)
+        - traefik.http.routers.akhq.entrypoints=web
+        - traefik.http.routers.akhq.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.akhq-secure.rule=Host(`akhq.${DOMAIN}`)
-      - traefik.http.routers.akhq-secure.entrypoints=websecure
-      - traefik.http.routers.akhq-secure.middlewares=basic-auth@file
+        # Set HTTPS domain #
+        - traefik.http.routers.akhq-secure.rule=Host(`akhq.${DOMAIN}`)
+        - traefik.http.routers.akhq-secure.entrypoints=websecure
+        - traefik.http.routers.akhq-secure.middlewares=basic-auth@file
 
 networks:
   default:

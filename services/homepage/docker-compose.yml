@@ -14,30 +14,31 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.homepage.loadbalancer.server.port=3000
+        # Set entrypoint port #
+        - traefik.http.services.homepage.loadbalancer.server.port=3000
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.homepage.entrypoints=web
-      - traefik.http.routers.homepage.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.homepage.entrypoints=web
+        - traefik.http.routers.homepage.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.homepage-secure.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.homepage-secure.entrypoints=websecure
-      - traefik.http.routers.homepage-secure.middlewares=authelia@docker
+        # Set HTTPS domain #
+        - traefik.http.routers.homepage-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.homepage-secure.entrypoints=websecure
+        - traefik.http.routers.homepage-secure.middlewares=authelia@docker
 
 networks:
   default:

@@ -97,17 +97,18 @@ services:
       - ./rules:/srv/traefik/rules
       - ./credentials:/srv/traefik/credentials
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
+    deploy:
+      labels:
       ## Watchtower configuration: Only enable monitoring ##
-      - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.monitor-only=true
+        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.monitor-only=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
+        ## Traefik configuration ##
       # Enable Traefik and global configuration #
-      - traefik.enable=true
+        - traefik.enable=true
 
       # Global HTTP -> HTTPS redirection
       # - traefik.http.routers.http-catchall.entrypoints=http
@@ -116,26 +117,26 @@ services:
       # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
 
       # Force global wildcard certificates generation
-      - traefik.http.routers.wildcard-certs.entrypoints=websecure
-      - traefik.http.routers.wildcard-certs.tls.certresolver=letsencrypt
-      - traefik.http.routers.wildcard-certs.tls.domains[0].main=*.${DOMAIN1}
-      - traefik.http.routers.wildcard-certs.tls.domains[0].sans=${DOMAIN1}
-      - traefik.http.routers.wildcard-certs.tls.domains[1].main=*.${DOMAIN2}
-      - traefik.http.routers.wildcard-certs.tls.domains[1].sans=${DOMAIN2}
-      - traefik.http.routers.wildcard-certs.tls.domains[2].main=*.${DOMAIN3}
-      - traefik.http.routers.wildcard-certs.tls.domains[2].sans=${DOMAIN3}
+        - traefik.http.routers.wildcard-certs.entrypoints=websecure
+        - traefik.http.routers.wildcard-certs.tls.certresolver=letsencrypt
+        - traefik.http.routers.wildcard-certs.tls.domains[0].main=*.${DOMAIN1}
+        - traefik.http.routers.wildcard-certs.tls.domains[0].sans=${DOMAIN1}
+        - traefik.http.routers.wildcard-certs.tls.domains[1].main=*.${DOMAIN2}
+        - traefik.http.routers.wildcard-certs.tls.domains[1].sans=${DOMAIN2}
+        - traefik.http.routers.wildcard-certs.tls.domains[2].main=*.${DOMAIN3}
+        - traefik.http.routers.wildcard-certs.tls.domains[2].sans=${DOMAIN3}
 
       ## Traefik dashboard configuration ##
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.api.rule=Host(`${DASHBOARD_DOMAIN}`)
-      - traefik.http.routers.api.entrypoints=web
-      - traefik.http.routers.api.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.api.rule=Host(`${DASHBOARD_DOMAIN}`)
+        - traefik.http.routers.api.entrypoints=web
+        - traefik.http.routers.api.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.api-secure.rule=Host(`${DASHBOARD_DOMAIN}`)
-      - traefik.http.routers.api-secure.entrypoints=websecure
-      - traefik.http.routers.api-secure.service=api@internal
-      - traefik.http.routers.api-secure.middlewares=authelia@docker
+        # Set HTTPS domain #
+        - traefik.http.routers.api-secure.rule=Host(`${DASHBOARD_DOMAIN}`)
+        - traefik.http.routers.api-secure.entrypoints=websecure
+        - traefik.http.routers.api-secure.service=api@internal
+        - traefik.http.routers.api-secure.middlewares=authelia@docker
 
 networks:
   default:

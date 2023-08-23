@@ -15,30 +15,31 @@ services:
     networks:
       - default
       - traefik-network
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.monitor-only=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.monitor-only=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
-      ## Traefik configuration ##
-      # Enable Traefik #
-      - traefik.enable=true
-      - traefik.docker.network=traefik-network
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
 
-      # Set entrypoint port #
-      - traefik.http.services.mailhog.loadbalancer.server.port=8025
+        # Set entrypoint port #
+        - traefik.http.services.mailhog.loadbalancer.server.port=8025
 
-      # Set HTTP domain and HTTP -> HTTPS redirection #
-      - traefik.http.routers.mailhog.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.mailhog.entrypoints=web
-      - traefik.http.routers.mailhog.middlewares=https-redirect@file
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.mailhog.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.mailhog.entrypoints=web
+        - traefik.http.routers.mailhog.middlewares=https-redirect@file
 
-      # Set HTTPS domain #
-      - traefik.http.routers.mailhog-secure.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.mailhog-secure.entrypoints=websecure
+        # Set HTTPS domain #
+        - traefik.http.routers.mailhog-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.mailhog-secure.entrypoints=websecure
 
 networks:
   default:

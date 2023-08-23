@@ -21,12 +21,13 @@ services:
     volumes:
       - ${VOLUME_DIR}/diun-data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      ## Watchtower configuration ##
-      - com.centurylinklabs.watchtower.enable=true
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=true
 
-      ## Diun configuration ##
-      - diun.enable=true
+        ## Diun configuration ##
+        - diun.enable=true
 
 networks:
   default:
