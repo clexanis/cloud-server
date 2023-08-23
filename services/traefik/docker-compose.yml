@@ -1,0 +1,143 @@
+version: "3.7"
+
+services:
+  ### Traefik: An open-source Edge Router that makes publishing your services a fun and easy experience ###
+  traefik:
+    image: traefik:2.10
+    container_name: traefik
+    restart: always
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
+    environment:
+      - NAMECHEAP_API_KEY=${NAMECHEAP_API_KEY}
+      - NAMECHEAP_API_USER=${NAMECHEAP_API_USER}
+      - CF_API_EMAIL=${CF_API_EMAIL}
+      - CF_API_KEY=${CF_API_KEY}
+      - TZ=${TZ}
+    command:
+      ## Global settings ##
+      - --global.checkNewVersion=true
+      - --global.sendAnonymousUsage=true
+
+      ## Log Settings (options: ERROR, DEBUG, PANIC, FATAL, WARN, INFO) - https://docs.traefik.io/observability/logs ##
+      - --log=true
+      - --log.level=${LOG_LEVEL}
+      - --log.filePath=/srv/traefik/log/traefik.log
+      # - --log.format=json
+
+      ## Access Log - https://doc.traefik.io/traefik/observability/access-logs ##
+      - --accesslog=true
+      - --accesslog.filepath=/srv/traefik/accesslog/traefik-access.log
+      - --accesslog.fields.defaultmode=keep
+      - --accesslog.fields.headers.defaultmode=keep
+      - --accesslog.bufferingSize=100
+      # - --accesslog.format=json
+
+      ## Metrics - https://doc.traefik.io/traefik/observability/metrics/overview ##
+      - --metrics=true
+      - --metrics.prometheus=true
+
+      ## Tracing - https://doc.traefik.io/traefik/observability/tracing/overview ##
+      - --tracing=false
+      - --tracing.serviceName=traefik
+      - --tracing.spanNameLimit=150
+
+      ## API Settings - https://docs.traefik.io/operations/api/, endpoints - https://docs.traefik.io/operations/api/#endpoints ##
+      - --api=true
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --api.debug=true
+      - --ping=false
+
+      ## Provider Settings - https://docs.traefik.io/providers/docker/#provider-configuration ##
+      - --providers.docker=true
+      - --providers.docker.swarmMode=false
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.watch=true
+      - --providers.docker.network=traefik-network
+      - --providers.file.directory=/srv/traefik/rules
+      - --providers.file.watch=true
+
+      ## Entrypoints Settings - https://docs.traefik.io/routing/entrypoints/#configuration ##
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      # Set security headers for https #
+      - --entryPoints.websecure.http.middlewares=security-headers@file
+      - --serverstransport.insecureskipverify=true
+      # Add Let's Encrypt as default certresolver for all services
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.http.tls.certresolver=letsencrypt
+      - --entrypoints.websecure.http.tls.domains[0].main=*.${DOMAIN1}
+      - --entrypoints.websecure.http.tls.domains[0].sans=${DOMAIN1}
+      - --entrypoints.websecure.http.tls.domains[1].main=*.${DOMAIN2}
+      - --entrypoints.websecure.http.tls.domains[1].sans=${DOMAIN2}
+      - --entrypoints.websecure.http.tls.domains[2].main=*.${DOMAIN3}
+      - --entrypoints.websecure.http.tls.domains[2].sans=${DOMAIN3}
+
+      ## Global HTTP -> HTTPS redirection - https://blog.jensknipper.de/blog/traefik-http-to-https-redirect ##
+      # - --entryPoints.web.http.redirections.entryPoint.to=websecure
+      # - --entryPoints.web.http.redirections.entryPoint.scheme=https
+      # - --entryPoints.web.http.redirections.entryPoint.permanent=true
+
+      ## Certificate Settings (Let's Encrypt) -  https://docs.traefik.io/https/acme/#configuration-examples ##
+      - --certificatesResolvers.letsencrypt.acme.email=${ACME_EMAIL}
+      - --certificatesResolvers.letsencrypt.acme.storage=/srv/traefik/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.delaybeforecheck=120
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers[0]=1.1.1.1:53
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers[1]=8.8.8.8:53
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ${VOLUME_DIR}/traefik-data/log:/srv/traefik/log
+      - ${VOLUME_DIR}/traefik-data/accesslog:/srv/traefik/accesslog
+      - ${VOLUME_DIR}/traefik-data/letsencrypt:/srv/traefik/letsencrypt
+      - ./rules:/srv/traefik/rules
+      - ./credentials:/srv/traefik/credentials
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      ## Watchtower configuration: Only enable monitoring ##
+      - com.centurylinklabs.watchtower.enable=true
+      - com.centurylinklabs.watchtower.monitor-only=true
+
+      ## Diun configuration ##
+      - diun.enable=true
+
+      ## Traefik configuration ##
+      # Enable Traefik and global configuration #
+      - traefik.enable=true
+
+      # Global HTTP -> HTTPS redirection
+      # - traefik.http.routers.http-catchall.entrypoints=http
+      # - traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)
+      # - traefik.http.routers.http-catchall.middlewares=redirect-to-https
+      # - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      # Force global wildcard certificates generation
+      - traefik.http.routers.wildcard-certs.entrypoints=websecure
+      - traefik.http.routers.wildcard-certs.tls.certresolver=letsencrypt
+      - traefik.http.routers.wildcard-certs.tls.domains[0].main=*.${DOMAIN1}
+      - traefik.http.routers.wildcard-certs.tls.domains[0].sans=${DOMAIN1}
+      - traefik.http.routers.wildcard-certs.tls.domains[1].main=*.${DOMAIN2}
+      - traefik.http.routers.wildcard-certs.tls.domains[1].sans=${DOMAIN2}
+      - traefik.http.routers.wildcard-certs.tls.domains[2].main=*.${DOMAIN3}
+      - traefik.http.routers.wildcard-certs.tls.domains[2].sans=${DOMAIN3}
+
+      ## Traefik dashboard configuration ##
+      # Set HTTP domain and HTTP -> HTTPS redirection #
+      - traefik.http.routers.api.rule=Host(`${DASHBOARD_DOMAIN}`)
+      - traefik.http.routers.api.entrypoints=web
+      - traefik.http.routers.api.middlewares=https-redirect@file
+
+      # Set HTTPS domain #
+      - traefik.http.routers.api-secure.rule=Host(`${DASHBOARD_DOMAIN}`)
+      - traefik.http.routers.api-secure.entrypoints=websecure
+      - traefik.http.routers.api-secure.service=api@internal
+      - traefik.http.routers.api-secure.middlewares=authelia@docker
+
+networks:
+  default:
+    external:
+      name: traefik-network
