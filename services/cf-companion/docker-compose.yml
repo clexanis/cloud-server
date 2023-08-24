@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+  env_file:
+    - ../global.env
+    - .env
+  ### Cloudflare-Companion: Automatic CNAME DNS Creation ###
+  cf-companion:
+    image: tiredofit/traefik-cloudflare-companion
+    container_name: cf-companion
+    restart: always
+    environment:
+      - TRAEFIK_VERSION=2
+      - CF_EMAIL=${CF_API_EMAIL}
+      - CF_TOKEN=${CF_API_KEY}
+      - TARGET_DOMAIN=
+      - DOMAIN1=${DOMAIN1}
+      - DOMAIN1_TARGET_DOMAIN=${DOMAIN1_TARGET_DOMAIN}
+      - DOMAIN1_ZONE_ID=${DOMAIN1_ZONE_ID}
+      - DOMAIN1_PROXIED=true
+      - DOMAIN2=${DOMAIN2}
+      - DOMAIN2_TARGET_DOMAIN=${DOMAIN2_TARGET_DOMAIN}
+      - DOMAIN2_ZONE_ID=${DOMAIN2_ZONE_ID}
+      - DOMAIN2_PROXIED=true
+      - DOMAIN3=${DOMAIN3}
+      - DOMAIN3_TARGET_DOMAIN=${DOMAIN3_TARGET_DOMAIN}
+      - DOMAIN3_ZONE_ID=${DOMAIN3_ZONE_ID}
+      - DOMAIN3_PROXIED=true
+      - TZ=${TZ}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
+      - traefik-network
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
+
+        ## Diun configuration ##
+        - diun.enable=${DIUN_ENABLE}
+
+networks:
+  default:
+    name: cf-companion-network
+  traefik-network:
+    name: traefik-network
+    external: true

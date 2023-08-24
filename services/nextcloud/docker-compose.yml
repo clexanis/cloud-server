@@ -1,0 +1,176 @@
+version: "3.7"
+
+services:
+  env_file:
+    - ../global.env
+    - .env
+  ### Nextcloud database: MariaDB ###
+  nextcloud-mariadb:
+    image: mariadb
+    container_name: nextcloud-mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - ${VOLUME_DIR}/nextcloud-db:/var/lib/mysql
+
+  ### Nextcloud cache: Redis ###
+  nextcloud-redis:
+    image: redis
+    container_name: nextcloud-redis
+    restart: always
+
+  ### Nextcloud application: Apache image ###
+  nextcloud-app:
+    image: nextcloud
+    container_name: nextcloud-app
+    restart: always
+    depends_on:
+      - nextcloud-mariadb
+      - nextcloud-redis
+    environment:
+      ## Data directory ##
+      - NEXTCLOUD_DATA_DIR=/srv/nextcloud/data
+
+      ## Trusted domains ##
+      - NEXTCLOUD_TRUSTED_DOMAINS=${DOMAIN}
+
+      ## Database configuration ##
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+
+      ## Mail configuration ##
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_AUTHTYPE=${SMTP_AUTHTYPE}
+      - SMTP_NAME=${SMTP_NAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_DOMAIN=${MAIL_DOMAIN}
+
+      ## Apache configuration ##
+      - OVERWRITEPROTOCOL=https
+      - OVERWRITEHOST=${DOMAIN}
+
+      ## Containers link
+      - MYSQL_HOST=nextcloud-mariadb
+      - REDIS_HOST=nextcloud-redis
+      - TRUSTED_PROXIES=traefik
+
+      - TZ=${TZ}
+    volumes:
+      - ${VOLUME_DIR}/nextcloud-data/html:/var/www/html
+      - ${VOLUME_DIR}/nextcloud-data/data:/srv/nextcloud/data
+    networks:
+      - default
+      - traefik-network
+    deploy:
+      labels:
+      ## Watchtower configuration: Only enable monitoring ##
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
+        - com.centurylinklabs.watchtower.monitor-only=true
+
+        ## Diun configuration ##
+        - diun.enable=${DIUN_ENABLE}
+
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
+
+        # Set entrypoint port #
+        - traefik.http.services.nextcloud.loadbalancer.server.port=80
+
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.nextcloud.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.nextcloud.entrypoints=web
+        - traefik.http.routers.nextcloud.middlewares=https-redirect@file
+
+        # Set HTTPS domain #
+        - traefik.http.routers.nextcloud-secure.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.nextcloud-secure.entrypoints=websecure
+        - traefik.http.routers.nextcloud-secure.middlewares=nextcloud,nextcloud-redirect
+
+      # Specific Nextcloud configuration #
+        - traefik.http.middlewares.nextcloud.headers.stsSeconds=155520011
+        - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
+        - traefik.http.middlewares.nextcloud.headers.stsPreload=true
+        - traefik.http.middlewares.nextcloud.headers.contentTypeNosniff=true
+        - traefik.http.middlewares.nextcloud.headers.browserXSSFilter=true
+        - traefik.http.middlewares.nextcloud-redirect.redirectregex.permanent=true
+        - traefik.http.middlewares.nextcloud-redirect.redirectregex.regex=/.well-known/(card|cal)dav
+        - traefik.http.middlewares.nextcloud-redirect.redirectregex.replacement=/remote.php/dav/
+
+  ### Nextcloud cron ###
+  nextcloud-cron:
+    image: nextcloud
+    container_name: nextcloud-cron
+    restart: always
+    depends_on:
+      - nextcloud-mariadb
+      - nextcloud-redis
+    entrypoint: /cron.sh
+    volumes:
+      - ${VOLUME_DIR}/nextcloud-data/html:/var/www/html
+      - ${VOLUME_DIR}/nextcloud-data/data:/srv/nextcloud/data
+
+  ### OnlyOffice: An online office suite comprising viewers and editors for texts, spreadsheets and presentations, fully compatible with Office Open XML formats: .docx, .xlsx, .pptx and enabling collaborative editing in real time. ###
+  nextcloud-onlyoffice:
+    image: onlyoffice/documentserver
+    container_name: nextcloud-onlyoffice
+    restart: always
+    environment:
+      - ONLYOFFICE_HTTPS_HSTS_ENABLED=false
+      - JWT_ENABLED=true
+      - JWT_SECRET=${ONLYOFFICE_TOKEN}
+      - TZ=${TZ}
+    volumes:
+      - ${VOLUME_DIR}/nextcloud-onlyoffice/data:/var/www/onlyoffice/Data
+      - ${VOLUME_DIR}/nextcloud-onlyoffice/log:/var/log/onlyoffice
+    networks:
+      - default
+      - traefik-network
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
+
+        ## Diun configuration ##
+        - diun.enable=${DIUN_ENABLE}
+
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
+
+        # Set entrypoint port #
+        - traefik.http.services.onlyoffice.loadbalancer.server.port=80
+
+        # Set HTTP domain and HTTP -> HTTPS redirection #
+        - traefik.http.routers.onlyoffice.rule=Host(`${DOMAIN}`) && PathPrefix(`/onlyoffice`)
+        - traefik.http.routers.onlyoffice.entrypoints=web
+        - traefik.http.routers.onlyoffice.middlewares=https-redirect@file
+
+        # Set HTTPS domain #
+        - traefik.http.routers.onlyoffice-secure.rule=Host(`${DOMAIN}`) && PathPrefix(`/onlyoffice`)
+        - traefik.http.routers.onlyoffice-secure.entrypoints=websecure
+        - traefik.http.routers.onlyoffice-secure.middlewares=onlyoffice,onlyoffice-strip
+
+      # Specific OnlyOffice configuration #
+        - traefik.http.middlewares.onlyoffice-strip.stripprefix.prefixes=/onlyoffice
+        - traefik.http.middlewares.onlyoffice-strip.stripprefix.forceSlash=true
+        - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https
+        - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Host=${DOMAIN}/onlyoffice
+
+networks:
+  default:
+    name: nextcloud-network
+  traefik-network:
+    name: traefik-network
+    external: true

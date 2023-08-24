@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  env_file:
+    - ../global.env
+    - .env
+  ## Portainer: A universal container management tool. It works with Kubernetes, Docker, Docker Swarm and Azure ACI and allows you to manage containers without needing to know platform-specific code. ##
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: always
+    environment:
+      - TZ=${TZ}
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - ${VOLUME_DIR}/portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
+      - traefik-network
+    deploy:
+      labels:
+        ## Watchtower configuration ##
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
+
+        ## Diun configuration ##
+        - diun.enable=${DIUN_ENABLE}
+
+        ## Traefik configuration ##
+        # Enable Traefik #
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
+
+        # Set entrypoint port #
+        - traefik.http.services.portainer.loadbalancer.server.port=9000
+
+      # Set HTTP domain #
+        - traefik.http.routers.portainer.entrypoints=web
+        - traefik.http.routers.portainer.rule=Host(`${DOMAIN}`)
+
+networks:
+  default:
+    name: portainer-network
+  traefik-network:
+    name: traefik-network
+    external: true
