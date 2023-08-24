@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ### Diun: Receive notifications when an image is updated on a Docker registry ###
   diun:
     image: crazymax/diun
@@ -24,10 +27,10 @@ services:
     deploy:
       labels:
         ## Watchtower configuration ##
-        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
 
         ## Diun configuration ##
-        - diun.enable=true
+        - diun.enable=${DIUN_ENABLE}
 
 networks:
   default:

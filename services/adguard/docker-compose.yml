@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ### AdGuard: AdGuard Home is a network-wide software for blocking ads & tracking. After you set it up, it'll cover ALL your home devices, and you don't need any client-side software for that ###
   adguard:
     image: adguard/adguardhome
@@ -20,10 +23,10 @@ services:
     deploy:
       labels:
         ## Watchtower configuration ##
-        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
 
         ## Diun configuration ##
-        - diun.enable=true
+        - diun.enable=${DIUN_ENABLE}
 
         ## Traefik configuration ##
         # Enable Traefik #

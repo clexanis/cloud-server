@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ### Zot: OCI-native container image registry, simplified. ###
   zot:
     image: ghcr.io/project-zot/zot-linux-amd64:v2.0.0-rc6
@@ -19,11 +22,11 @@ services:
     deploy:
       labels:
         ## Watchtower configuration ##
-        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
         - com.centurylinklabs.watchtower.monitor-only=true
 
         ## Diun configuration ##
-        - diun.enable=true
+        - diun.enable=${DIUN_ENABLE}
 
         ## Traefik configuration ##
         # Enable Traefik #

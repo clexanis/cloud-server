@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ### vaultwarden: An alternative implementation of the Bitwarden server API written in Rust and compatible with upstream Bitwarden clients ###
   vaultwarden:
     image: vaultwarden/server
@@ -17,11 +20,11 @@ services:
     deploy:
       labels:
         ## Watchtower configuration ##
-        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
         - com.centurylinklabs.watchtower.monitor-only=true
 
         ## Diun configuration ##
-        - diun.enable=true
+        - diun.enable=${DIUN_ENABLE}
 
         ## Traefik configuration ##
         # Enable Traefik #

@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
  ### MongoDB: A document-oriented NoSQL database used for high volume data storage ###
   mongo:
     image: mongo

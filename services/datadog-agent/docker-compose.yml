@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ### Datadog Agent: The Datadog Agent collects metrics and events from your systems and apps. ###
   datadog-agent:
     image: gcr.io/datadoghq/agent:7

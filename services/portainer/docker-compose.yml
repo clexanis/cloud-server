@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ## Portainer: A universal container management tool. It works with Kubernetes, Docker, Docker Swarm and Azure ACI and allows you to manage containers without needing to know platform-specific code. ##
   portainer:
     image: portainer/portainer-ce
@@ -18,10 +21,10 @@ services:
     deploy:
       labels:
         ## Watchtower configuration ##
-        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
 
         ## Diun configuration ##
-        - diun.enable=true
+        - diun.enable=${DIUN_ENABLE}
 
         ## Traefik configuration ##
         # Enable Traefik #

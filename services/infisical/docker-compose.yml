@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  env_file:
+    - ../global.env
+    - .env
   ### Infisical: OPEN SOURCE and END-TO-END ENCRYPTED platform that lets you securely sync secrets and configs across your team, devices, and infrastructure. ###
   infisical-nginx:
     image: nginx
@@ -19,11 +22,11 @@ services:
     deploy:
       labels:
         ## Watchtower configuration ##
-        - com.centurylinklabs.watchtower.enable=true
+        - com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE}
         - com.centurylinklabs.watchtower.monitor-only=true
 
         ## Diun configuration ##
-        - diun.enable=true
+        - diun.enable=${DIUN_ENABLE}
 
         ## Traefik configuration ##
         # Enable Traefik #
