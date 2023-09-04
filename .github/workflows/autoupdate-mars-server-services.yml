@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 'Update Subtree'
         run: |
           git fetch https://github.com/borjapazr/mars-server.git main:mars-server
